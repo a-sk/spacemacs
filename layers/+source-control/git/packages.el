@@ -35,10 +35,11 @@
       (evil-define-key 'motion magit-mode-map
         (kbd dotspacemacs-leader-key) spacemacs-default-map))))
 
-(defun git/init-helm-gitignore ()
-  (use-package helm-gitignore
-    :defer t
-    :init (spacemacs/set-leader-keys "gI" 'helm-gitignore)))
+(when (eq dotspacemacs-completion-tool 'helm)
+  (defun git/init-helm-gitignore ()
+    (use-package helm-gitignore
+      :defer t
+      :init (spacemacs/set-leader-keys "gI" 'helm-gitignore))))
 
 (defun git/init-git-commit ()
   (use-package git-commit
