@@ -1512,7 +1512,7 @@ ARG non nil means that the editing style is `vim'."
              (define-key helm-map (kbd "C-k") 'helm-delete-minibuffer-contents)
              (define-key helm-map (kbd "C-h") nil)
              (define-key helm-map (kbd "C-l") 'helm-recenter-top-bottom-other-window))))
-         (spacemacs//helm-hjkl-navigation (member dotspacemacs-editing-style '(vim hybrid)))
+         (spacemacs//hjkl-completion-navigation)
 
          (defun spacemacs/helm-edit ()
            "Switch in edit mode depending on the current helm buffer."
