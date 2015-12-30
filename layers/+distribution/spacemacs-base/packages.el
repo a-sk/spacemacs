@@ -1110,6 +1110,23 @@ Example: (evil-map visual \"<\" \"<gv\")"
    (defun spacemacs-base/init-flx ())
 
    (defun spacemacs-base/init-counsel ()
+
+     (defun spacemacs/counsel-git-grep-symbol ()
+       (interactive)
+       (counsel-git-grep nil (thing-at-point 'symbol)))
+
+     (defun spacemacs/counsel-ag-symbol ()
+       (interactive)
+       (counsel-ag (thing-at-point 'symbol)))
+
+     (defun spacemacs/counsel-ag-project ()
+       (interactive)
+       (counsel-ag nil (projectile-project-root)))
+
+     (defun spacemacs/counsel-ag-project-symbol ()
+       (interactive)
+       (counsel-ag (thing-at-point 'symbol) (projectile-project-root)))
+
      (use-package counsel
        :config
        (recentf-mode)
