@@ -157,6 +157,11 @@ start.")
   "If non nil then `ido' replaces `helm' for some commands. For now only
 `find-files' (SPC f f) is replaced.")
 
+(defvar dotspacemacs-completion-tool 'helm
+  "Completion tool to use. Default is helm. Choices are helm, ivy
+and ido. When ivy is chosen, substitutes are chosen for helm
+related packages.")
+
 (defvar dotspacemacs-helm-resize nil
   "If non nil, `helm' will try to minimize the space it uses.")
 
