@@ -19,7 +19,6 @@
         git-commit
         git-messenger
         git-timemachine
-        helm-gitignore
         magit
         magit-gitflow
         ;; not compatible with magit 2.1 at the time of release
@@ -28,6 +27,9 @@
         smeargle
         ))
 
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-gitignore git-packages))
+
 (defun git/init-evil-magit ()
   (unless (eq dotspacemacs-editing-style 'emacs)
     (with-eval-after-load 'magit
@@ -35,11 +37,10 @@
       (evil-define-key 'motion magit-mode-map
         (kbd dotspacemacs-leader-key) spacemacs-default-map))))
 
-(when (eq dotspacemacs-completion-tool 'helm)
-  (defun git/init-helm-gitignore ()
-    (use-package helm-gitignore
-      :defer t
-      :init (spacemacs/set-leader-keys "gI" 'helm-gitignore))))
+(defun git/init-helm-gitignore ()
+  (use-package helm-gitignore
+    :defer t
+    :init (spacemacs/set-leader-keys "gI" 'helm-gitignore)))
 
 (defun git/init-git-commit ()
   (use-package git-commit

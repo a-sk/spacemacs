@@ -14,8 +14,10 @@
   '(
     auto-dictionary
     flyspell
-    helm-flyspell
     ))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-flyspell spell-checking-packages))
 
 (defun spell-checking/init-auto-dictionary ()
   (use-package auto-dictionary
@@ -64,8 +66,7 @@
     :config
     (spacemacs|diminish flyspell-mode " Ⓢ" " S")))
 
-(when (eq dotspacemacs-completion-tool 'helm)
-  (defun spell-checking/init-helm-flyspell ()
-    (use-package helm-flyspell
-      :commands helm-flyspell-correct
-      :init (spacemacs/set-leader-keys "Sc" 'helm-flyspell-correct))))
+(defun spell-checking/init-helm-flyspell ()
+  (use-package helm-flyspell
+    :commands helm-flyspell-correct
+    :init (spacemacs/set-leader-keys "Sc" 'helm-flyspell-correct)))

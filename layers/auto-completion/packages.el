@@ -16,13 +16,17 @@
         ac-ispell
         company
         company-statistics
-        helm-company
-        helm-c-yasnippet
         hippie-exp
         yasnippet
         auto-yasnippet
         smartparens
         ))
+
+(setq auto-completion-packages
+      (append auto-completion-packages
+              (when (eq dotspacemacs-completion-tool 'helm)
+                '(helm-company
+                  helm-c-yasnippet))))
 
 ;; company-quickhelp from MELPA is not compatible with 24.3 anymore
 (unless (version< emacs-version "24.4")
@@ -142,29 +146,27 @@
     :defer t
     :init (add-hook 'company-mode-hook 'company-quickhelp-mode)))
 
-(when (eq dotspacemacs-completion-tool 'helm)
-  (defun auto-completion/init-helm-c-yasnippet ()
-    (use-package helm-c-yasnippet
-      :defer t
-      :init
-      (progn
-        (defun spacemacs/helm-yas ()
-          "Properly lazy load helm-c-yasnipper."
-          (interactive)
-          (spacemacs/load-yasnippet)
-          (require 'helm-c-yasnippet)
-          (call-interactively 'helm-yas-complete))
-        (spacemacs/set-leader-keys "is" 'spacemacs/helm-yas)
-        (setq helm-c-yas-space-match-any-greedy t)))))
+(defun auto-completion/init-helm-c-yasnippet ()
+  (use-package helm-c-yasnippet
+    :defer t
+    :init
+    (progn
+      (defun spacemacs/helm-yas ()
+        "Properly lazy load helm-c-yasnipper."
+        (interactive)
+        (spacemacs/load-yasnippet)
+        (require 'helm-c-yasnippet)
+        (call-interactively 'helm-yas-complete))
+      (spacemacs/set-leader-keys "is" 'spacemacs/helm-yas)
+      (setq helm-c-yas-space-match-any-greedy t))))
 
-(when (eq dotspacemacs-completion-tool 'helm)
-  (defun auto-completion/init-helm-company ()
-    (use-package helm-company
-      :if (configuration-layer/package-usedp 'company)
-      :defer t
-      :init
-      (with-eval-after-load 'company
-        (define-key company-active-map (kbd "C-/") 'helm-company)))))
+(defun auto-completion/init-helm-company ()
+  (use-package helm-company
+    :if (configuration-layer/package-usedp 'company)
+    :defer t
+    :init
+    (with-eval-after-load 'company
+      (define-key company-active-map (kbd "C-/") 'helm-company))))
 
 (defun auto-completion/init-hippie-exp ()
   ;; replace dabbrev-expand
