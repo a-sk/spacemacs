@@ -63,6 +63,7 @@
                 (`ivy '(counsel
                         flx
                         hydra
+                        (ivy-spacemacs :location local)
                         smex
                         swiper))
                 (_ '(helm
@@ -1088,6 +1089,18 @@ ARG non nil means that the editing style is `vim'."
                                              "ido.last")
         ;; enable fuzzy matching
         ido-enable-flex-matching t))
+
+(defun spacemacs-base/init-ivy-spacemacs ()
+  (use-package ivy-spacemacs
+    :init
+    (progn
+      (spacemacs/set-leader-keys
+        "h SPC d" 'ivy-spacemacs-docs
+        "h SPC ." 'ivy-spacemacs-dotspacemacs
+        "h SPC f" 'ivy-spacemacs-faq
+        "h SPC l" 'ivy-spacemacs-layers
+        "h SPC p" 'ivy-spacemacs-packages
+        "h SPC t" 'ivy-spacemacs-toggles))))
 
 (defun spacemacs-base/init-package-menu ()
   (evilified-state-evilify-map package-menu-mode-map

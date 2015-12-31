@@ -66,6 +66,45 @@
             (ivy-spacemacs//faq-candidates)
             :action #'ivy-spacemacs//faq-goto-marker))
 
+;;;###autoload
+(defun ivy-spacemacs-layers ()
+  (interactive)
+  (ivy-spacemacs//init)
+  (ivy-read "Spacemacs Layers: "
+            (sort (mapcar 'symbol-name (configuration-layer/get-layers-list)) 'string<)
+            :action 'ivy-spacemacs//layer-action-open-readme
+            :caller 'ivy-spacemacs-layers))
+
+(ivy-set-actions
+ 'ivy-spacemacs-layers
+ '(("a" 'ivy-spacemacs//layer-action-add-layer "add layer")
+   ("e" 'ivy-spacemacs//layer-action-open-readme-edit "add readme for editing")
+   ("p" 'ivy-spacemacs//layer-action-open-packages "open packages.el")
+   ("r" 'ivy-spacemacs//layer-action-open-readme "open readme")))
+
+;;;###autoload
+(defun ivy-spacemacs-packages ()
+  (interactive)
+  (ivy-spacemacs//init)
+  (ivy-read "Spacemacs Packages: "
+            (ivy-spacemacs//package-candidates)
+            :action 'ivy-spacemacs//package-action-goto-init-func
+            :caller 'ivy-spacemacs-packages))
+
+;;;###autoload
+(defun ivy-spacemacs-toggles ()
+  (interactive)
+  (ivy-read "Spacemacs Toggles: "
+            (ivy-spacemacs//toggle-candidates)
+            :action 'ivy-spacemacs//toggle))
+
+;;;###autoload
+(defun ivy-spacemacs-dotspacemacs ()
+  (interactive)
+  (ivy-read ".spacemacs variables: "
+            (ivy-spacemacs//dotspacemacs-candidates)
+            :action 'ivy-spacemacs//go-to-dotfile-variable))
+
 (defun ivy-spacemacs//documentation-candidates ()
   (let (result file-extension)
     (dolist (filename (directory-files spacemacs-docs-directory))
@@ -113,8 +152,7 @@
                   ;; guide on Github.
                   (concat user-emacs-directory candidate)
                 (concat spacemacs-docs-directory candidate))))
-    (cond ((and (equal (file-name-extension file) "md")
-                (not helm-current-prefix-arg))
+    (cond ((equal (file-name-extension file) "md")
            (condition-case nil
                (with-current-buffer (find-file-noselect file)
                  (gh-md-render-buffer)
@@ -126,47 +164,23 @@
           (t
            (find-file file)))))
 
-(defun ivy-spacemacs-layers ()
-  (interactive)
-  (ivy-spacemacs//init)
-  (ivy-read "Spacemacs Layers: "
-            (sort (configuration-layer/get-layers-list) 'string<)
-            :action #'ivy-spacemacs//layer-action-open-readme))
-
-(defun ivy-spacemacs//layer-source ()
-  "Construct the helm source for the layer section."
-  `((name . "Layers")
-    (candidates . ,(sort (configuration-layer/get-layers-list) 'string<))
-    (candidate-number-limit)
-    (keymap . ,ivy-spacemacs--layer-map)
-    (action . (("Open README.org"
-                . ivy-spacemacs//layer-action-open-readme)
-               ("Open packages.el"
-                . ivy-spacemacs//layer-action-open-packages)
-               ;; TODO remove extensions in 0.105.0
-               ("Open extensions.el"
-                . ivy-spacemacs//layer-action-open-extensions)
-               ("Add Layer"
-                . ivy-spacemacs//layer-action-add-layer)
-               ("Open README.org (for editing)"
-                . ivy-spacemacs//layer-action-open-readme-edit)))))
-
-(defvar ivy-spacemacs--layer-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "<S-return>") '(lambda () (interactive)
-                                          ;; Add Layer
-                                          (helm-select-nth-action 3)))
-    map)
-  "Keymap for Spacemacs Layers sources")
-
-(defun ivy-spacemacs//package-source ()
-  "Construct the helm source for the packages."
-  `((name . "Packages")
-    (candidates . ,(ivy-spacemacs//package-candidates))
-    (candidate-number-limit)
-    (action . (("Go to init function"
-                . ivy-spacemacs//package-action-goto-init-func)))))
+;; (defun ivy-spacemacs//layer-source ()
+;;   "Construct the helm source for the layer section."
+;;   `((name . "Layers")
+;;     (candidates . ,(sort (configuration-layer/get-layers-list) 'string<))
+;;     (candidate-number-limit)
+;;     (keymap . ,ivy-spacemacs--layer-map)
+;;     (action . (("Open README.org"
+;;                 . ivy-spacemacs//layer-action-open-readme)
+;;                ("Open packages.el"
+;;                 . ivy-spacemacs//layer-action-open-packages)
+;;                ;; TODO remove extensions in 0.105.0
+;;                ("Open extensions.el"
+;;                 . ivy-spacemacs//layer-action-open-extensions)
+;;                ("Add Layer"
+;;                 . ivy-spacemacs//layer-action-add-layer)
+;;                ("Open README.org (for editing)"
+;;                 . ivy-spacemacs//layer-action-open-readme-edit)))))
 
 (defun ivy-spacemacs//package-candidates ()
   "Return the sorted candidates for package source."
@@ -179,13 +193,13 @@
             result))
     (sort result 'string<)))
 
-(defun ivy-spacemacs//toggle-source ()
-  "Construct the helm source for the toggles."
-  (helm-build-sync-source "Toggles"
-    :candidates #'ivy-spacemacs//toggle-candidates
-    :persistent-action #'ivy-spacemacs//toggle
-    :keymap helm-map
-    :action (helm-make-actions "Toggle" #'ivy-spacemacs//toggle)))
+;; (defun ivy-spacemacs//toggle-source ()
+;;   "Construct the helm source for the toggles."
+;;   (helm-build-sync-source "Toggles"
+;;     :candidates #'ivy-spacemacs//toggle-candidates
+;;     :persistent-action #'ivy-spacemacs//toggle
+;;     :keymap helm-map
+;;     :action (helm-make-actions "Toggle" #'ivy-spacemacs//toggle)))
 
 (defun ivy-spacemacs//toggle-candidates ()
   "Return the sorted candidates for toggle source."
@@ -212,12 +226,6 @@
     (setq result (cl-sort result 'string< :key 'car))
     result))
 
-(defun ivy-spacemacs//dotspacemacs-source ()
-  `((name . "Dotfile")
-    (candidates . ,(ivy-spacemacs//dotspacemacs-candidates))
-    (candidate-number-limit)
-    (action . (("Go to variable" . ivy-spacemacs//go-to-dotfile-variable)))))
-
 (defun ivy-spacemacs//dotspacemacs-candidates ()
   "Return the sorted candidates for all the dospacemacs variables."
   (sort (dotspacemacs/get-variable-string-list) 'string<))
@@ -231,8 +239,7 @@
                  (concat (ht-get configuration-layer-paths
                                  (intern candidate))
                          candidate)))))
-    (if (and (equal (file-name-extension file) "org")
-             (not helm-current-prefix-arg))
+    (if (equal (file-name-extension file) "org")
         (if edit
             (find-file (concat path file))
           (spacemacs/view-org-file (concat path file) "^" 'all))
@@ -303,12 +310,12 @@
   (concat spacemacs-docs-directory "FAQ.org")
   "Location of the FAQ file.")
 
-(defun ivy-spacemacs//faq-source ()
-  "Construct the helm source for the FAQ."
-  `((name . "FAQ")
-    (candidates . ,(ivy-spacemacs//faq-candidates))
-    (candidate-number-limit)
-    (action . (("Go to question" . ivy-spacemacs//faq-goto-marker)))))
+;; (defun ivy-spacemacs//faq-source ()
+;;   "Construct the helm source for the FAQ."
+;;   `((name . "FAQ")
+;;     (candidates . ,(ivy-spacemacs//faq-candidates))
+;;     (candidate-number-limit)
+;;     (action . (("Go to question" . ivy-spacemacs//faq-goto-marker)))))
 
 (defun ivy-spacemacs//faq-candidate (cand)
   (let ((str (substring-no-properties (car cand))))
