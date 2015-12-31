@@ -63,6 +63,7 @@
                 (`ivy '(counsel
                         flx
                         hydra
+                        smex
                         swiper))
                 (_ '(helm
                      helm-flx
@@ -1370,6 +1371,15 @@ ARG non nil means that the editing style is `vim'."
     (progn
       (projectile-global-mode)
       (spacemacs|hide-lighter projectile-mode))))
+
+(defun spacemacs-base/init-smex ()
+  (use-package smex
+    :defer t
+    :init
+    (progn
+      (setq-default smex-history-length 32
+                    smex-save-file (concat spacemacs-cache-directory
+                                           ".smex-items")))))
 
 (defun spacemacs-base/init-quelpa ())
 
