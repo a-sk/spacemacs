@@ -62,6 +62,7 @@
               (pcase dotspacemacs-completion-tool
                 (`ivy '(counsel
                         flx
+                        hydra
                         swiper))
                 (_ '(helm
                      helm-flx
@@ -126,21 +127,12 @@
       "pp"  'projectile-switch-project
       "sd"  'counsel-ag
       "sD"  'spacemacs/counsel-ag-symbol
+      "sj"  'counsel-imenu
+      "Tc"  'counsel-load-theme
       "/"   'counsel-git-grep
       "*"   'spacemacs/counsel-git-grep-symbol
       "sp"  'spacemacs/counsel-ag-project
-      "sP"  'spacemacs/counsel-ag-project-symbol)
-    (global-set-key (kbd "M-x")  'counsel-M-x)
-    (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-    (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-    (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-    (global-set-key (kbd "<f1> l") 'counsel-load-library)
-    (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-    (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-    (global-set-key (kbd "C-c g") 'counsel-git)
-    (global-set-key (kbd "C-c j") 'counsel-git-grep)
-    (global-set-key (kbd "C-c k") 'counsel-ag)
-    (global-set-key (kbd "C-x l") 'counsel-locate)))
+      "sP"  'spacemacs/counsel-ag-project-symbol)))
 
 (defun spacemacs-base/init-diminish ()
   (use-package diminish
@@ -1087,6 +1079,8 @@ ARG non nil means that the editing style is `vim'."
         :evil-leader "tEh")
       (spacemacs|diminish hybrid-mode " Ⓔh" " Eh"))))
 
+(defun spacemacs-base/init-hydra ())
+
 (defun spacemacs-base/init-ido ()
   (ido-mode t)
   (setq ido-save-directory-list-file (concat spacemacs-cache-directory
@@ -1487,30 +1481,15 @@ ARG non nil means that the editing style is `vim'."
       "ir" 'ivy-resume
       "bb" 'ivy-switch-buffer)
     (setq ivy-height 15
-          projectile-completion-system 'ivy)
+          ;; merge recentf and bookmarks into buffer switching
+          ivy-use-virtual-buffers t)
+    (when (configuration-layer/package-usedp 'projectile)
+      (setq projectile-completion-system 'ivy))
     (ivy-mode 1)
     (global-set-key (kbd "C-c C-r") 'ivy-resume)
     (global-set-key (kbd "<f6>") 'ivy-resume)
-    ;; (when (member dotspacemacs-editing-style '(vim hybrid))
-    ;;   (define-key ivy-minibuffer-map "\C-k" 'ivy-previous-line)
-    ;;   (define-key ivy-minibuffer-map "\C-j" 'ivy-next-line))
-    (defun spacemacs//ivy-hjkl-navigation (&optional arg)
-      "Set navigation in ivy on `jklh'.
-ARG non nil means that the editing style is `vim'."
-      (let ((map ivy-minibuffer-map))
-        (cond
-         (arg
-          (define-key map (kbd "C-j") 'ivy-next-line)
-          (define-key map (kbd "C-k") 'ivy-previous-line)
-          (define-key map (kbd "C-h") (kbd "DEL"))
-          (define-key map (kbd "C-l") 'ivy-alt-done))
-         (t
-          (define-key map (kbd "C-j") 'ivy-alt-done)
-          (define-key map (kbd "C-k") 'ivy-kill-line)
-          (define-key map (kbd "C-h") nil)
-          (define-key map (kbd "C-l") nil)))))
-    (spacemacs//ivy-hjkl-navigation (member dotspacemacs-editing-style '(vim hybrid)))
-    )
+    (spacemacs//hjkl-completion-navigation))
+
   (use-package swiper
     :config
     (spacemacs/set-leader-keys
