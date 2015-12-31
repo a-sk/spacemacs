@@ -107,8 +107,11 @@
                magit-status)
     :init
     (progn
-      (setq magit-completing-read-function 'magit-builtin-completing-read
-            magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
+      (setq magit-completing-read-function
+            (if (eq dotspacemacs-completion-tool 'ivy)
+                'ivy-completing-read
+              'magit-builtin-completing-read))
+      (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
       (add-hook 'git-commit-mode-hook 'fci-mode)
       ;; On Windows, we must use Git GUI to enter username and password
       ;; See: https://github.com/magit/magit/wiki/FAQ#windows-cannot-push-via-https
