@@ -96,10 +96,10 @@
 
 (defun spacemacs-base/init-counsel ()
 
-  (defvar counsel-ag-commands '(("ag" . "ag --vimgrep")
-                                ("pt" . "pt -e --nocolor --nogroup")
-                                ("ack" . "ack --noclor --nogroup")
-                                ("grep" . "grep -nP")))
+  (defvar counsel-ag-commands '(("ag" . "ag --vimgrep %S")
+                                ("pt" . "pt -e --nocolor --nogroup --column %S")
+                                ("ack" . "ack --nocolor --nogroup --column %S")
+                                ("grep" . "grep -nP %S")))
 
   (defun spacemacs//counsel-search (tools &optional input dir)
     (let ((input (when input
@@ -114,7 +114,8 @@
                           (executable-find tl))
                  (throw 'cmd
                         (cdr (assoc-string tl counsel-ag-commands)))))
-             (throw 'cmd (cdr (assoc-string "grep" counsel-ag-commands))))))
+             ;; Change this to grep when grep works
+             (throw 'cmd (cdr (assoc-string "ag" counsel-ag-commands))))))
       (counsel-ag input dir)))
 
   (cl-loop for (tools tool-name) in '((dotspacemacs-search-tools  "")
@@ -181,8 +182,9 @@
       "stF" 'spacemacs/search-pt-region-or-symbol
       "stp" 'spacemacs/search-project-pt
       "stP" 'spacemacs/search-project-pt-region-or-symbol
-      "sgf" 'spacemacs/search-grep
-      "sgF" 'spacemacs/search-grep-region-or-symbol
+      ;; Not working yet
+      ;; "sgf" 'spacemacs/search-grep
+      ;; "sgF" 'spacemacs/search-grep-region-or-symbol
       "sgp" 'counsel-git-grep
       "sgP" 'spacemacs/counsel-git-grep-region-or-symbol
       "skf" 'spacemacs/search-ack
