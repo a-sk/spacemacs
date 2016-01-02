@@ -99,7 +99,7 @@
   (defvar counsel-ag-commands '(("ag" . "ag --vimgrep %S")
                                 ("pt" . "pt -e --nocolor --nogroup --column %S")
                                 ("ack" . "ack --nocolor --nogroup --column %S")
-                                ("grep" . "grep -nP %S")))
+                                ("grep" . "grep -nrP %S .")))
 
   (defun spacemacs//counsel-search (tools &optional input dir)
     (let ((input (when input
@@ -183,8 +183,8 @@
       "stp" 'spacemacs/search-project-pt
       "stP" 'spacemacs/search-project-pt-region-or-symbol
       ;; Not working yet
-      ;; "sgf" 'spacemacs/search-grep
-      ;; "sgF" 'spacemacs/search-grep-region-or-symbol
+      "sgf" 'spacemacs/search-grep
+      "sgF" 'spacemacs/search-grep-region-or-symbol
       "sgp" 'counsel-git-grep
       "sgP" 'spacemacs/counsel-git-grep-region-or-symbol
       "skf" 'spacemacs/search-ack
