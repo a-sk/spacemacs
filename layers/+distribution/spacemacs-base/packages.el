@@ -1571,7 +1571,7 @@ ARG non nil means that the editing style is `vim'."
     :config
     (spacemacs/set-leader-keys
       "ss" 'swiper
-      "sb" 'swiper-multi)
+      "sb" 'swiper-all)
     (global-set-key "\C-s" 'swiper)))
 
 (defun spacemacs-base/init-undo-tree ()
