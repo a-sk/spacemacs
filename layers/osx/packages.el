@@ -5,8 +5,10 @@
         pbcopy
         launchctl
         reveal-in-osx-finder
-        helm
         ))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm osx-packages))
 
 (when (spacemacs/system-is-mac)
   ;; Enable built-in trash support via finder API if available (only on Emacs

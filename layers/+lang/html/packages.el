@@ -19,7 +19,6 @@
     evil-matchit
     flycheck
     haml-mode
-    helm-css-scss
     jade-mode
     less-css-mode
     rainbow-delimiters
@@ -31,6 +30,9 @@
     web-mode
     yasnippet
     ))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-css-scss html-packages))
 
 (when (configuration-layer/layer-usedp 'auto-completion)
   ;;TODO: whenever company-web makes a backend for haml-mode it should be added here. -- @robbyoconnor

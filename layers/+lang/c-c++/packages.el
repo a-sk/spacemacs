@@ -21,14 +21,16 @@
     company-ycmd
     flycheck
     gdb-mi
-    helm-cscope
-    helm-gtags
     semantic
     srefactor
     stickyfunc-enhance
     ycmd
     xcscope
     ))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-cscope c-c++-packages)
+  (push 'helm-gtags c-c++-packages))
 
 (unless (version< emacs-version "24.4")
   (add-to-list 'c-c++-packages 'srefactor))

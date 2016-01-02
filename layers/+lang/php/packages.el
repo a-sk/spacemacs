@@ -17,13 +17,15 @@
         eldoc
         flycheck
         ggtags
-        helm-gtags
         php-auto-yasnippets
         (php-extras :location (recipe :fetcher github :repo "arnested/php-extras"))
         php-mode
         phpcbf
         phpunit
         ))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-gtags php-packages))
 
 (when (configuration-layer/layer-usedp 'auto-completion)
   (defun php/post-init-company ()

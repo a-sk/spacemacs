@@ -1,8 +1,10 @@
 (setq nixos-packages '(nix-mode
                        company
                        nixos-options
-                       helm-nixos-options
                        company-nixos-options))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-nixos-options nixos-packages))
 
 (defun nixos/init-nix-mode ()
   (use-package nix-mode))

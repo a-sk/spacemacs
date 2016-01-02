@@ -1,5 +1,7 @@
  ;; see conditional package inclusion
-(setq dash-packages '(helm-dash))
+(setq dash-packages
+      (when (eq dotspacemacs-completion-tool 'helm)
+        '(helm-dash)))
 
 (cond
  ((spacemacs/system-is-mac)

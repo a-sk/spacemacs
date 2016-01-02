@@ -13,7 +13,6 @@
 (setq shell-packages
       '(
         company
-        helm
         multi-term
         (comint :location built-in)
         shell
@@ -24,6 +23,9 @@
         esh-help
         magit
         ))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm shell-packages))
 
 (defun shell/pre-init-company ()
   ;; support in eshell

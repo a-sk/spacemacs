@@ -13,8 +13,10 @@
 (setq games-post-extensions
       '(
         emacs-builtin-tetris
-        helm-games
         ))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-games games-post-extensions))
 
 (defun games/init-emacs-builtin-tetris ()
   (use-package tetris

@@ -10,7 +10,10 @@
 ;;
 ;;; License: GPLv3
 
-(defvar spotify-packages '(spotify helm-spotify))
+(defvar spotify-packages '(spotify))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-spotify spotify-packages))
 
 (defun spotify/init-spotify ()
   (use-package spotify

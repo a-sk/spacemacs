@@ -11,8 +11,10 @@
 ;;; License: GPLv3
 
 (setq cscope-packages '(evil-jumper
-                        helm-cscope
                         xcscope))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-cscope 'cscope-packages))
 
 (setq cscope-excluded-packages '())
 

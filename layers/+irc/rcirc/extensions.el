@@ -1,7 +1,6 @@
 (setq rcirc-post-extensions
-  '(
-    helm-rcirc
-    ))
+      (when (eq dotspacemacs-completion-tool 'helm)
+        '(helm-rcirc)))
 
 (defun rcirc/init-helm-rcirc ()
   (use-package helm-rcirc

@@ -12,9 +12,11 @@
 
 (setq gtags-packages
   '(
-    helm-gtags
     ggtags
     ))
+
+(when (eq dotspacemacs-completion-tool 'helm)
+  (push 'helm-gtags gtags-packages))
 
 (defun gtags/init-ggtags ()
   (use-package ggtags
