@@ -96,45 +96,99 @@
 
 (defun spacemacs-base/init-counsel ()
 
-  (defun spacemacs/counsel-git-grep-symbol ()
-    (interactive)
-    (counsel-git-grep nil (thing-at-point 'symbol)))
+  (defvar counsel-ag-commands '(("ag" . "ag --vimgrep")
+                                ("pt" . "pt -e --nocolor --nogroup")
+                                ("ack" . "ack --noclor --nogroup")
+                                ("grep" . "grep -nP")))
 
-  (defun spacemacs/counsel-ag-symbol ()
-    (interactive)
-    (counsel-ag (thing-at-point 'symbol)))
+  (defun spacemacs//counsel-search (tools &optional input dir)
+    (let ((input (when input
+                   (if (region-active-p)
+                       (buffer-substring-no-properties
+                        (region-beginning) (region-end))
+                     (thing-at-point 'symbol))))
+          (counsel-ag-base-command
+           (catch 'cmd
+             (dolist (tl tools)
+               (when (and (assoc-string tl counsel-ag-commands)
+                          (executable-find tl))
+                 (throw 'cmd
+                        (cdr (assoc-string tl counsel-ag-commands)))))
+             (throw 'cmd (cdr (assoc-string "grep" counsel-ag-commands))))))
+      (counsel-ag input dir)))
 
-  (defun spacemacs/counsel-ag-project ()
-    (interactive)
-    (counsel-ag nil (projectile-project-root)))
+  (cl-loop for (tools tool-name) in '((dotspacemacs-search-tools  "")
+                                      ((list "ag") "-ag")
+                                      ((list "pt") "-pt")
+                                      ((list "ack") "-ack")
+                                      ((list "grep") "-grep"))
+           do
+           (eval `(defun ,(intern (format "spacemacs/search%s" tool-name)) ()
+                    (interactive)
+                    (spacemacs//counsel-search ,tools)))
+           (eval `(defun ,(intern (format "spacemacs/search%s-region-or-symbol"
+                                          tool-name)) ()
+                    (interactive)
+                    (spacemacs//counsel-search ,tools t)))
+           (eval `(defun ,(intern (format "spacemacs/search-project%s" tool-name)) ()
+                    (interactive)
+                    (spacemacs//counsel-search ,tools nil (projectile-project-root))))
+           (eval `(defun ,(intern (format "spacemacs/search-project%s-region-or-symbol"
+                                          tool-name)) ()
+                    (interactive)
+                    (spacemacs//counsel-search ,tools t (projectile-project-root)))))
 
-  (defun spacemacs/counsel-ag-project-symbol ()
-    (interactive)
-    (counsel-ag (thing-at-point 'symbol) (projectile-project-root)))
+  (defun spacemacs/counsel-git-grep-region-or-symbol ()
+    (let ((input (if (region-active-p)
+                     (buffer-substring-no-properties
+                      (region-beginning) (region-end))
+                   (thing-at-point 'symbol))))
+      (counsel-git-grep nil input)))
 
   (use-package counsel
     :config
     (recentf-mode)
     (spacemacs/set-leader-keys
       dotspacemacs-command-key 'counsel-M-x
+      ;; files
       "ff"  'counsel-find-file
       "fL"  'counsel-locate
+      ;; help
       "hdf" 'counsel-describe-function
       "hdv" 'counsel-describe-variable
       "hdk" 'describe-key
       "hdp" 'describe-package
       "hdc" 'describe-command
       "hdb" 'describe-bindings
-      "pg"  'counsel-git
+      ;; projects
       "pp"  'projectile-switch-project
-      "sd"  'counsel-ag
-      "sD"  'spacemacs/counsel-ag-symbol
+      ;; jumping
       "sj"  'counsel-imenu
+      ;; themes
       "Tc"  'counsel-load-theme
-      "/"   'counsel-git-grep
-      "*"   'spacemacs/counsel-git-grep-symbol
-      "sp"  'spacemacs/counsel-ag-project
-      "sP"  'spacemacs/counsel-ag-project-symbol)))
+      ;; search
+      "/"   'spacemacs/search-project
+      "*"   'spacemacs/search-project-region-or-symbol
+      "sf"  'spacemacs/search
+      "sF"  'spacemacs/search-region-or-symbol
+      "sp"  'spacemacs/search-project
+      "sP"  'spacemacs/search-project-region-or-symbol
+      "saf" 'spacemacs/search-ag
+      "saF" 'spacemacs/search-ag-region-or-symbol
+      "sap" 'spacemacs/search-project-ag
+      "saP" 'spacemacs/search-project-ag-region-or-symbol
+      "stf" 'spacemacs/search-pt
+      "stF" 'spacemacs/search-pt-region-or-symbol
+      "stp" 'spacemacs/search-project-pt
+      "stP" 'spacemacs/search-project-pt-region-or-symbol
+      "sgf" 'spacemacs/search-grep
+      "sgF" 'spacemacs/search-grep-region-or-symbol
+      "sgp" 'counsel-git-grep
+      "sgP" 'spacemacs/counsel-git-grep-region-or-symbol
+      "skf" 'spacemacs/search-ack
+      "skF" 'spacemacs/search-ack-region-or-symbol
+      "skp" 'spacemacs/search-project-ack
+      "skP" 'spacemacs/search-project-ack-region-or-symbol)))
 
 (defun spacemacs-base/init-diminish ()
   (use-package diminish
@@ -1516,7 +1570,8 @@ ARG non nil means that the editing style is `vim'."
   (use-package swiper
     :config
     (spacemacs/set-leader-keys
-      "ss" 'swiper)
+      "ss" 'swiper
+      "sb" 'swiper-multi)
     (global-set-key "\C-s" 'swiper)))
 
 (defun spacemacs-base/init-undo-tree ()
