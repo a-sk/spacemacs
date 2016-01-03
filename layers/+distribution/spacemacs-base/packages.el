@@ -103,6 +103,10 @@
       ("grep" . "grep -nrP %S .")))
 
   (defun spacemacs//counsel-search (tools &optional input dir)
+    "Search using the first available tool in TOOLS. Default tool
+to try is grep. If INPUT is non nil, use the region or the symbol
+at the point as the initial input. If DIR is non nil start in
+that directory."
     (let ((input (when input
                    (if (region-active-p)
                        (buffer-substring-no-properties
@@ -115,32 +119,57 @@
                           (executable-find tl))
                  (throw 'cmd
                         (cdr (assoc-string tl counsel-ag-commands)))))
-             ;; Change this to grep when grep works
-             (throw 'cmd (cdr (assoc-string "ag" counsel-ag-commands))))))
+             (throw 'cmd (cdr (assoc-string "grep" counsel-ag-commands))))))
       (counsel-ag input dir)))
 
-  (cl-loop for (tools tool-name) in '((dotspacemacs-search-tools  "")
-                                      ((list "ag") "-ag")
-                                      ((list "pt") "-pt")
-                                      ((list "ack") "-ack")
-                                      ((list "grep") "-grep"))
+  (cl-loop for (tools tool-name) in '((dotspacemacs-search-tools  "auto")
+                                      ((list "ag") "ag")
+                                      ((list "pt") "pt")
+                                      ((list "ack") "ack")
+                                      ((list "grep") "grep"))
            do
-           (eval `(defun ,(intern (format "spacemacs/search%s" tool-name)) ()
-                    (interactive)
-                    (spacemacs//counsel-search ,tools)))
-           (eval `(defun ,(intern (format "spacemacs/search%s-region-or-symbol"
-                                          tool-name)) ()
-                    (interactive)
-                    (spacemacs//counsel-search ,tools t)))
-           (eval `(defun ,(intern (format "spacemacs/search-project%s" tool-name)) ()
-                    (interactive)
-                    (spacemacs//counsel-search ,tools nil (projectile-project-root))))
-           (eval `(defun ,(intern (format "spacemacs/search-project%s-region-or-symbol"
-                                          tool-name)) ()
-                    (interactive)
-                    (spacemacs//counsel-search ,tools t (projectile-project-root)))))
+           (eval
+            `(progn
+               (defun ,(intern (format "spacemacs/search-%s" tool-name)) ()
+                 ,(format
+                   "Use `spacemacs//counsel-search' to search in the current
+directory with %s." (if (string= tool-name "auto")
+                        "a tool selected from `dotspacemacs-search-tools'."
+                      tool-name))
+                 (interactive)
+                 (spacemacs//counsel-search ,tools))
+               (defun ,(intern (format "spacemacs/search-%s-region-or-symbol"
+                                       tool-name)) ()
+                 ,(format
+                   "Use `spacemacs//counsel-search' to search for
+the selected region or the symbol under the point in the current
+directory with %s." (if (string= tool-name "auto")
+                        "a tool selected from `dotspacemacs-search-tools'."
+                      tool-name))
+                 (interactive)
+                 (spacemacs//counsel-search ,tools t))
+               (defun ,(intern (format "spacemacs/search-project-%s" tool-name)) ()
+                 ,(format
+                   "Use `spacemacs//counsel-search' to search in the current
+project with %s." (if (string= tool-name "auto")
+                      "a tool selected from `dotspacemacs-search-tools'."
+                    tool-name))
+                 (interactive)
+                 (spacemacs//counsel-search ,tools nil (projectile-project-root)))
+               (defun ,(intern (format "spacemacs/search-project-%s-region-or-symbol"
+                                       tool-name)) ()
+                 ,(format
+                   "Use `spacemacs//counsel-search' to search for
+the selected region or the symbol under the point in the current
+project with %s." (if (string= tool-name "auto")
+                      "a tool selected from `dotspacemacs-search-tools'."
+                    tool-name))
+                 (interactive)
+                 (spacemacs//counsel-search ,tools t (projectile-project-root))))))
 
   (defun spacemacs/counsel-git-grep-region-or-symbol ()
+    "Use `counsel-git-grep' to search for the selected region or
+the symbol under the point in the current project with git grep."
     (let ((input (if (region-active-p)
                      (buffer-substring-no-properties
                       (region-beginning) (region-end))
@@ -171,10 +200,10 @@
       ;; themes
       "Tc"  'counsel-load-theme
       ;; search
-      "/"   'spacemacs/search-project
-      "*"   'spacemacs/search-project-region-or-symbol
-      "sf"  'spacemacs/search
-      "sF"  'spacemacs/search-region-or-symbol
+      "/"   'spacemacs/search-project-auto
+      "*"   'spacemacs/search-project-auto-region-or-symbol
+      "sf"  'spacemacs/search-auto
+      "sF"  'spacemacs/search-auto-region-or-symbol
       "sp"  'spacemacs/search-project
       "sP"  'spacemacs/search-project-region-or-symbol
       "saf" 'spacemacs/search-ag
@@ -1578,8 +1607,9 @@ ARG non nil means that the editing style is `vim'."
 
   (use-package swiper
     :config
-
     (defun spacemacs/swiper-region-or-symbol ()
+      "Run `swiper' with the selected region or the symbol under
+the point as the initial input."
       (interactive)
       (let ((input (if (region-active-p)
                        (buffer-substring-no-properties
@@ -1588,7 +1618,8 @@ ARG non nil means that the editing style is `vim'."
         (swiper--ivy input)))
 
     (defun spacemacs/swiper-all-region-or-symbol ()
-      "Run `swiper' for all opened buffers."
+      "Run `swiper-all' with the selected region or the symbol
+under the point as the initial input."
       (interactive)
       (ivy-read "Swiper: " (swiper--multi-candidates
                             (cl-remove-if-not
