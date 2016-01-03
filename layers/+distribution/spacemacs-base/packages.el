@@ -107,7 +107,7 @@
                    (if (region-active-p)
                        (buffer-substring-no-properties
                         (region-beginning) (region-end))
-                     (thing-at-point 'symbol))))
+                     (thing-at-point 'symbol t))))
           (counsel-ag-base-command
            (catch 'cmd
              (dolist (tl tools)
@@ -144,7 +144,7 @@
     (let ((input (if (region-active-p)
                      (buffer-substring-no-properties
                       (region-beginning) (region-end))
-                   (thing-at-point 'symbol))))
+                   (thing-at-point 'symbol t))))
       (counsel-git-grep nil input)))
 
   (use-package counsel
@@ -1578,9 +1578,35 @@ ARG non nil means that the editing style is `vim'."
 
   (use-package swiper
     :config
+
+    (defun spacemacs/swiper-region-or-symbol ()
+      (interactive)
+      (let ((input (if (region-active-p)
+                       (buffer-substring-no-properties
+                        (region-beginning) (region-end))
+                     (thing-at-point 'symbol t))))
+        (swiper--ivy input)))
+
+    (defun spacemacs/swiper-all-region-or-symbol ()
+      "Run `swiper' for all opened buffers."
+      (interactive)
+      (ivy-read "Swiper: " (swiper--multi-candidates
+                            (cl-remove-if-not
+                             #'buffer-file-name
+                             (buffer-list)))
+                :initial-input (if (region-active-p)
+                                   (buffer-substring-no-properties
+                                    (region-beginning) (region-end))
+                                 (thing-at-point 'symbol t))
+                :action 'swiper-multi-action-2
+                :unwind #'swiper--cleanup
+                :caller 'swiper-multi))
+
     (spacemacs/set-leader-keys
       "ss" 'swiper
-      "sb" 'swiper-all)
+      "sS" 'spacemacs/swiper-region-or-symbol
+      "sb" 'swiper-all
+      "sB" 'spacemacs/swiper-all-region-or-symbol)
     (global-set-key "\C-s" 'swiper)))
 
 (defun spacemacs-base/init-undo-tree ()
