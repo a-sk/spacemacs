@@ -96,10 +96,11 @@
 
 (defun spacemacs-base/init-counsel ()
 
-  (defvar counsel-ag-commands '(("ag" . "ag --vimgrep %S")
-                                ("pt" . "pt -e --nocolor --nogroup --column %S")
-                                ("ack" . "ack --nocolor --nogroup --column %S")
-                                ("grep" . "grep -nrP %S .")))
+  (defvar counsel-ag-commands
+    '(("ag" . "ag --vimgrep %S .")
+      ("pt" . "pt.exe -e --nocolor --nogroup --column %S .")
+      ("ack" . "ack --nocolor --nogroup --column %S .")
+      ("grep" . "grep -nrP %S .")))
 
   (defun spacemacs//counsel-search (tools &optional input dir)
     (let ((input (when input
