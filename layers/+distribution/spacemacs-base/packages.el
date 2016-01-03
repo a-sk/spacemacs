@@ -162,6 +162,8 @@
       "hdp" 'describe-package
       "hdc" 'describe-command
       "hdb" 'describe-bindings
+      ;; insert
+      "iu"  'counsel-unicode-char
       ;; projects
       "pp"  'projectile-switch-project
       ;; jumping
@@ -183,7 +185,6 @@
       "stF" 'spacemacs/search-pt-region-or-symbol
       "stp" 'spacemacs/search-project-pt
       "stP" 'spacemacs/search-project-pt-region-or-symbol
-      ;; Not working yet
       "sgf" 'spacemacs/search-grep
       "sgF" 'spacemacs/search-grep-region-or-symbol
       "sgp" 'counsel-git-grep
