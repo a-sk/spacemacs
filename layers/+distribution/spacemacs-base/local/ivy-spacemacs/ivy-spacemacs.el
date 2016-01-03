@@ -51,7 +51,6 @@
 
 ;;;###autoload
 (defun ivy-spacemacs-docs (arg)
-  "Layers discovery with helm interface."
   (interactive "P")
   (ivy-spacemacs//init arg)
   (ivy-read "Spacemacs Documentation: "
@@ -60,7 +59,6 @@
 
 ;;;###autoload
 (defun ivy-spacemacs-faq (arg)
-  "Looking in the FAQ with helm."
   (interactive "P")
   (ivy-read "Spacemacs FAQ"
             (ivy-spacemacs//faq-candidates)
@@ -71,7 +69,7 @@
   (interactive)
   (ivy-spacemacs//init)
   (ivy-read "Spacemacs Layers: "
-            (sort (mapcar 'symbol-name (configuration-layer/get-layers-list)) 'string<)
+            (ivy-spacemacs//layer-candidates)
             :action 'ivy-spacemacs//layer-action-open-readme
             :caller 'ivy-spacemacs-layers))
 
@@ -181,6 +179,10 @@
 ;;                 . ivy-spacemacs//layer-action-add-layer)
 ;;                ("Open README.org (for editing)"
 ;;                 . ivy-spacemacs//layer-action-open-readme-edit)))))
+
+(defun ivy-spacemacs//layer-candidates ()
+  (sort (mapcar 'symbol-name (configuration-layer/get-layers-list))
+        'string<))
 
 (defun ivy-spacemacs//package-candidates ()
   "Return the sorted candidates for package source."
